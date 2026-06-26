@@ -158,4 +158,44 @@ export const tools: ToolDef[] = [
       return client.createFolder(args.name, args.parent_id);
     },
   },
+
+  // === 11. Move File ===
+  {
+    name: 'gdrive_move_file',
+    description: 'Move a file or folder into a different folder by changing its parent. Removes it from its current folder(s) and adds it to the destination folder. The file itself is NOT copied or deleted — it is the same file in a new location. Moves are reversible.',
+    inputSchema: z.object({
+      file_id: z.string().describe('The Google Drive file or folder ID to move'),
+      destination_folder_id: z.string().describe('Destination folder ID to move the file into (use "root" for My Drive root)'),
+      remove_from_folder_id: z.string().optional().describe('Specific current parent folder ID to remove the file from. Omit to remove from ALL current parents (the usual case for a clean move).'),
+    }),
+    handler: async (client, args) => {
+      return client.moveFile(args.file_id, args.destination_folder_id, args.remove_from_folder_id);
+    },
+  },
+
+  // === 12. Copy File ===
+  {
+    name: 'gdrive_copy_file',
+    description: 'Create a copy of a file. Optionally give the copy a new name and/or place it in a specific folder. The original is left unchanged.',
+    inputSchema: z.object({
+      file_id: z.string().describe('The Google Drive file ID to copy'),
+      name: z.string().optional().describe('Name for the new copy. Omit to use Google\'s default ("Copy of <original>").'),
+      parent_id: z.string().optional().describe('Destination folder ID for the copy. Omit to place it alongside the original.'),
+    }),
+    handler: async (client, args) => {
+      return client.copyFile(args.file_id, args.name, args.parent_id);
+    },
+  },
+
+  // === 13. List Permissions ===
+  {
+    name: 'gdrive_list_permissions',
+    description: 'List who has access to a file and their roles (owner, writer, commenter, reader) — including individual users, groups, domains, and anyone-with-link.',
+    inputSchema: z.object({
+      file_id: z.string().describe('The Google Drive file ID'),
+    }),
+    handler: async (client, args) => {
+      return client.listPermissions(args.file_id);
+    },
+  },
 ];

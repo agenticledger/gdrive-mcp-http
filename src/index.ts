@@ -39,10 +39,12 @@ const SLUG = 'googledrive';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
 const GOOGLE_REDIRECT_URI = `${SERVER_BASE_URL}/oauth/callback`;
+// Full 'drive' scope: required so the app can read/move/modify files the USER
+// already owns (drive.file only grants access to files the app itself created,
+// which blocks moving/organizing pre-existing files). Changing this scope means
+// existing users must re-authorize to mint a new refresh token that carries it.
 const GOOGLE_SCOPES = [
-  'https://www.googleapis.com/auth/drive.readonly',
-  'https://www.googleapis.com/auth/drive.file',
-  'https://www.googleapis.com/auth/drive.metadata.readonly',
+  'https://www.googleapis.com/auth/drive',
 ].join(' ');
 
 const app = express();

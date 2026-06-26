@@ -315,6 +315,37 @@ export class GDriveClient {
     }
   }
 
+  // === Move File (change parent) ===
+  // Uses Drive's addParents/removeParents query params on a metadata PATCH.
+  // If removeParentId is omitted, removes the file from ALL its current parents.
+
+  async moveFile(fileId: string, addParentId: string, removeParentId?: string) {
+    let removeParents = removeParentId;
+    if (!removeParents) {
+      const meta = await this.getFile(fileId);
+      removeParents = (meta.parents || []).join(',');
+    }
+    return this.request<any>('PATCH', `/files/${encodeURIComponent(fileId)}`, {
+      addParents: addParentId,
+      removeParents,
+      fields: 'id,name,parents,webViewLink',
+    });
+  }
+
+  // === Copy File ===
+
+  async copyFile(fileId: string, name?: string, parentId?: string) {
+    const body: any = {};
+    if (name) body.name = name;
+    if (parentId) body.parents = [parentId];
+    return this.request<any>(
+      'POST',
+      `/files/${encodeURIComponent(fileId)}/copy`,
+      { fields: 'id,name,parents,webViewLink' },
+      body,
+    );
+  }
+
   // === List Permissions ===
 
   async listPermissions(fileId: string) {
